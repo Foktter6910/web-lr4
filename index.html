@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Динамічне меню</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+    }
+
+    .main-menu {
+      background-color: #333;
+      color: #fff;
+      position: relative;
+    }
+
+    .main-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .main-menu li {
+      position: relative;
+    }
+
+    .main-menu a {
+      display: block;
+      padding: 15px 20px;
+      color: white;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .main-menu a:hover,
+    .main-menu .active > a {
+      background-color: #555;
+    }
+
+    .main-menu li ul {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #444;
+      min-width: 200px;
+      z-index: 10;
+      flex-direction: column;
+    }
+
+    .main-menu li:hover > ul {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-menu li ul li ul {
+      left: 100%;
+      top: 0;
+    }
+
+    .burger-menu {
+      display: none;
+      background: none;
+      border: none;
+      padding: 15px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .burger-menu span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: white;
+      margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+      .main-menu ul {
+        flex-direction: column;
+        display: none;
+      }
+
+      .main-menu.open ul {
+        display: flex;
+      }
+
+      .burger-menu {
+        display: block;
+      }
+
+      .main-menu li ul {
+        position: static;
+      }
+
+      .main-menu li:hover > ul {
+        display: none;
+      }
+
+      .main-menu li.active > ul {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="main-menu">
+    <button class="burger-menu" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="menuContainer"></ul>
+  </nav>
+
+  <script>
+    const menuData = {
+      items: [
+        {
+          title: "Головна",
+          link: "#",
+          submenu: []
+        },
+        {
+          title: "Про нас",
+          link: "#",
+          submenu: [
+            {
+              title: "Команда",
+              link: "#",
+              submenu: [
+                { title: "Розробники", link: "#" },
+                { title: "Менеджери", link: "#" }
+              ]
+            },
+            {
+              title: "Історія",
+              link: "#",
+              submenu: []
+            }
+          ]
+        },
+        {
+          title: "Послуги",
+          link: "#",
+          submenu: [
+            {
+              title: "Веб-розробка",
+              link: "#",
+              submenu: []
+            },
+            {
+              title: "Дизайн",
+              link: "#",
+              submenu: []
+            }
+          ]
+        },
+        {
+          title: "Портфоліо",
+          link: "#",
+          submenu: []
+        },
+        {
+          title: "Контакти",
+          link: "#",
+          submenu: []
+        }
+      ]
+    };
+
+    function createMenu(items, isSub = false) {
+      const ul = document.createElement("ul");
+      items.forEach(item => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.textContent = item.title;
+        a.href = item.link;
+        a.tabIndex = 0;
+
+        a.addEventListener("click", e => {
+          if (item.submenu && item.submenu.length > 0) {
+            e.preventDefault();
+            li.classList.toggle("active");
+          }
+        });
+
+        li.appendChild(a);
+        if (item.submenu && item.submenu.length > 0) {
+          const subMenu = createMenu(item.submenu, true);
+          li.appendChild(subMenu);
+        }
+
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+
+    const menuContainer = document.getElementById("menuContainer");
+    const fullMenu = createMenu(menuData.items);
+    menuContainer.replaceWith(fullMenu);
+
+    const burger = document.querySelector(".burger-menu");
+    const nav = document.querySelector(".main-menu");
+    burger.addEventListener("click", () => {
+      nav.classList.toggle("open");
+    });
+    document.querySelectorAll(".main-menu a").forEach(link => {
+      link.addEventListener("click", () => {
+        document.querySelectorAll(".main-menu a").forEach(l => l.parentElement.classList.remove("active"));
+        link.parentElement.classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>
